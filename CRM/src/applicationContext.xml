@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd">
+	<bean id="MydataSource"
+		class="org.springframework.jdbc.datasource.SimpleDriverDataSource">
+		<property name="driverClass" value="com.mysql.jdbc.Driver"></property>
+		<property name="url" value="jdbc:mysql:///crm"></property>
+		<property name="username" value="root"></property>
+		<property name="password" value=""></property>
+	</bean>
+	<bean id="MysessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+		<property name="dataSource" ref="MydataSource"></property>
+		<property name="configLocations" value="classpath:hibernate.cfg.xml"></property>
+	</bean>
+	<bean id="MyHibernateTemplate" class="org.springframework.orm.hibernate5.HibernateTemplate">
+		<property name="sessionFactory" ref="MysessionFactory"></property>
+	</bean>
+	<!-- Dao -->
+	<bean id="PersonDao" class="crm.com.dao.PersonDao">
+		<property name="template" ref="MyHibernateTemplate"></property>
+	</bean>
+	<!-- service -->
+	<bean id="PersonService" class="crm.com.service.PersonService">
+		<property name="dao" ref="PersonDao"></property>
+	</bean>
+	<!-- 创建并装配action -->
+	<bean id="changePwdAcion" class="crm.com.controller.changePwdAction" scope="prototype">
+		<property name="service" ref="PersonService"></property>
+	</bean>
+	<bean id="loginAcion" class="crm.com.controller.loginAction" scope="prototype">
+		<property name="service" ref="PersonService"></property>
+	</bean>
+	<bean id="registerAcion" class="crm.com.controller.registerAction" scope="prototype">
+		<property name="service" ref="PersonService"></property>
+	</bean>
+	<bean id="UpLoginAcion" class="crm.com.controller.uploginAction" scope="prototype"></bean>
+	<!-- 事务管理 -->
+	<bean id="txManager"
+		class="org.springframework.orm.hibernate5.HibernateTransactionManager">
+		<property name="sessionFactory" ref="MysessionFactory"></property>
+	</bean>
+	<tx:advice id="txAdvice" transaction-manager="txManager">
+		<tx:attributes>
+			<tx:method name="find*" read-only="true"></tx:method>
+			<tx:method name="*" read-only="false"></tx:method>
+		</tx:attributes>
+	</tx:advice>
+	<aop:config>
+		<aop:pointcut id="point"
+			expression="execution(* crm.com.service.*Service.*(..))"></aop:pointcut>
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="point"></aop:advisor>
+	</aop:config>
+</beans>

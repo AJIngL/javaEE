@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.5//EN"
+        "http://struts.apache.org/dtds/struts-2.5.dtd">
+
+
+<struts>
+    <package name="Person" extends="struts-default">
+       <action name="login" class="loginAcion">
+       		<result name="success">/Welcome.jsp</result>
+    		<result name="input">/userLogin.jsp</result>
+       </action>
+       <action name="register" class="registerAcion">
+       		<result name="success">/Welcome.jsp</result>
+    		<result name="input">/userRegister.jsp</result>
+       </action>
+       <action name="changePsw" class="changePwdAcion">
+        	<result name="success">/Welcome.jsp</result>
+    		<result name="input">/ChangePwd.jsp</result>
+        </action>
+        <action name="UpLogin" class="UpLoginAcion">
+        	<result name="success">/Welcome.jsp</result>
+        </action>
+    </package>
+</struts>
